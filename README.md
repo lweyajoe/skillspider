@@ -3,7 +3,7 @@ Web App with Flask (Python)
 
 Python 3
 
-## Local Environment
+# Local Environment
 
 # Install
 
@@ -67,7 +67,7 @@ my_project/
 
 </code>
 
-Please note: to host on vercel as a vercel app, the project structure becomes;
+## Please note: to host on vercel as a vercel app, the project structure becomes;
 
 <code>
 my_project/
@@ -98,8 +98,8 @@ my_project/
 
 # Screenshot
 
-### Home
-![alt text]([https://github.com/lweyajoe/skillspider/blob/main/static/images/Project%20Screenshot.png])
+## Home
+[homepage]([https://github.com/lweyajoe/skillspider/blob/main/static/images/Project%20Screenshot.png])
 
 # Passwords
 

@@ -1,3 +1,4 @@
+# Import necessary modules and libraries
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager
 from flask_login import UserMixin
@@ -11,21 +12,29 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 
+# Initialize Flask application
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' # Add a secret key for CSRF protection
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///job_board.db'
 db = SQLAlchemy(app)
 
+# Initialize Flask-Login for managing user sessions
 login_manager = LoginManager(app)
 # Add the user_loader decorator
+
+# Define a user loader function for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     return Admin.query.get(int(user_id))
 
+# Initialize Flask-Migrate for database migrations
 migrate = Migrate(app, db)
+# Initialize CSRF protection
 csrf = CSRFProtect(app) # Initialize CSRF protection
 
+# Define Flask forms for various purposes
 class EmployerForm(FlaskForm):
+    # ... Field definitions and validators ...
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     company = StringField('Company', validators=[DataRequired()])
@@ -39,6 +48,7 @@ class EmployerForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class JobSeekerForm(FlaskForm):
+    # ... Field definitions and validators ...
     fname = StringField('First Name', validators=[DataRequired()])
     lname = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -54,18 +64,23 @@ class JobSeekerForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class AdminLoginForm(FlaskForm):
+    # ... Field definitions and validators ...
     username = StringField('Username', validators=[DataRequired()])
     password = StringField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
 class ContactForm(FlaskForm):
+    # ... Field definitions and validators ...
     name = StringField('Name', validators=[DataRequired()], render_kw={"placeholder": "Your name"})
     email = StringField('Email', validators=[DataRequired()], render_kw={"placeholder": "Your email address"})
     county = SelectField('County', choices=[('Nairobi', 'Nairobi'), ('Mombasa', 'Mombasa'), ('Kisumu', 'Kisumu')])
     subject = TextAreaField('Subject', validators=[DataRequired()], render_kw={"placeholder": "Write something..."})
     submit = SubmitField('Submit')
 
+# Define SQLAlchemy models for database tables
+
 class Employer(db.Model):
+    # ... Table fields and relationships ...
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -80,6 +95,7 @@ class Employer(db.Model):
     job_listings = db.relationship('JobListing', backref='employer', lazy=True)
 
 class JobSeeker(db.Model):
+    # ... Table fields and relationships ...
     id = db.Column(db.Integer, primary_key=True)
     fname = db.Column(db.String(100), nullable=False)
     lname = db.Column(db.String(100), nullable=False)
@@ -95,6 +111,7 @@ class JobSeeker(db.Model):
     address = db.Column(db.String(255))
 
 class JobListing(db.Model):
+    # ... Table fields and relationships ...
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     company = db.Column(db.String(100), nullable=False)
@@ -106,6 +123,7 @@ class JobListing(db.Model):
     employer_id = db.Column(db.Integer, db.ForeignKey('employer.id'), nullable=False)
 
 class Contact(db.Model):
+    # ... Table fields and relationships ...
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -113,6 +131,7 @@ class Contact(db.Model):
     subject = db.Column(db.String(255), nullable=False)
 
 class Admin(db.Model, UserMixin):
+    # ... Table fields and methods ...
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=True)
     password_hash = db.Column(db.String(100), nullable=False)
@@ -124,6 +143,7 @@ class Admin(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 class User(db.Model):
+    # ... Table fields and methods ...
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -135,11 +155,13 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+# Define route for the home page
 @app.route('/')
 def index():
     job_listings = JobListing.query.all()  # Query job listings from the database
     return render_template('index.html', job_listings=job_listings)
 
+# Define route for the contact page with form handling
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     form = ContactForm()  # Create an instance of the form
@@ -167,18 +189,22 @@ def contact():
         
     return render_template('contact.html', form=form)  # Pass the form to the template
 
+# Define route for displaying job listings
 @app.route('/jobs')
 def jobs():
-    job_listings = JobListing.query.all()  # Query job listings from the database
+    # Query job listings from the database
+    job_listings = JobListing.query.all()  
     return render_template('jobs.html', job_listings=job_listings)
 
+# Define route for the employer dashboard with form handling
 @app.route('/employer', methods=['GET', 'POST'])
 def employer_dashboard():
     form = EmployerForm()  # Create an instance of the form
 
     # Fetch job listings from the database
     # job_listings = JobListing.query.all()
-    # print("Job Listings from Database:", job_listings)  # Add this line for debugging
+    # print("Job Listings from Database:", job_listings)  
+    # Add this line for debugging
 
     print("Before Querying Database")
     job_listings = JobListing.query.all()
@@ -242,10 +268,12 @@ def employer_dashboard():
 
     return render_template('employer.html', form=form)
 
+# Define route for the job seeker dashboard with form handling
 @app.route('/job-seeker', methods=['GET', 'POST'])
 def job_seeker_dashboard():
     form = JobSeekerForm()  # Create an instance of the form
 
+    # Query job seekers from the database for debugging
     print("Before Querying Database")
     job_seekers = JobSeeker.query.all()
     print("After Querying Database")
@@ -313,6 +341,7 @@ def job_seeker_dashboard():
 
     return render_template('job-seeker.html', form=form)  # Pass the form to the template
 
+# Define route for the admin dashboard with form handling
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
 
@@ -344,6 +373,7 @@ def admin_login():
 
     return render_template('admin_login.html', form=form)
 
+# Define route for the admin dashboard with form handling
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
@@ -354,6 +384,7 @@ def admin_dashboard():
 
 from flask_login import logout_user
 
+#admin logout
 @app.route('/admin/logout')
 @login_required
 def admin_logout():
