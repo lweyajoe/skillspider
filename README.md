@@ -5,7 +5,7 @@ Python 3
 
 ## Local Environment
 
-### Install
+# Install
 
 1- Create a virtual environment
 
@@ -43,7 +43,6 @@ or
 <code>
 my_project/
     ├── app.py
-    ├── forms.py
     ├── setup_admin.py
     ├── templates/
     │   ├── index.html
@@ -66,6 +65,35 @@ my_project/
     │   └── ...
     └── ...
 
+</code>
+
+Please note: to host on vercel as a vercel app, the project structure becomes;
+
+<code>
+my_project/
+    ├── api/
+    │   ├── app.py
+    │   ├── setup_admin.py
+    │   ├── templates/
+    │   │   ├── index.html
+    │   │   ├── admin_login.html
+    │   │   ├── employer.html
+    │   │   ├── job_seeker.html
+    │   │   └── ...
+    │   ├── static/
+    │   │   ├── css/
+    │   │   │   ├── style.css
+    │   │   │   └── ...
+    │   │   ├── js/
+    │   │   │   ├── script.js
+    │   │   │   └── ...
+    │   │   └── ...
+    │   ├── migrations/
+    │   │   ├── versions/
+    │   │   │   ├── ...
+    │   │   │   └── ...
+    │   │   └── ...
+    │   └── ...
 </code>
 
 # Screenshot
